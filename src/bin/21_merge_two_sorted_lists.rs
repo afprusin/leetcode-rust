@@ -1,8 +1,9 @@
-use std::borrow::{Borrow};
+use std::borrow::Borrow;
 
 pub struct Solution {}
 
 // Definition for singly-linked list.
+// Remove this struct def when submitting
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ListNode {
     pub val: i32,
@@ -10,6 +11,7 @@ pub struct ListNode {
 }
 
 impl ListNode {
+    // Remove this constructor def when submitting
     #[inline]
     fn new(val: i32) -> Self {
         ListNode { next: None, val }
@@ -48,14 +50,16 @@ impl Solution {
                     value_stack.push(l2_val.val);
                     l2_iter = l2_val.next.borrow();
                 }
-            } else { panic!("Something something unreachable") }
+            } else {
+                panic!("Something something unreachable")
+            }
         }
 
         let mut head_node = None;
         loop {
             match value_stack.pop() {
                 Some(next_val) => head_node = ListNode::push(next_val, head_node),
-                None => break
+                None => break,
             }
         }
 
@@ -73,8 +77,7 @@ fn main() {
             let current = result.unwrap();
             println!("{}", current.val);
             result = current.next;
-        }
-        else {
+        } else {
             break;
         }
     }
