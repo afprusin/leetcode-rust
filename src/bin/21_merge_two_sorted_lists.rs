@@ -1,5 +1,4 @@
-use std::borrow::{Borrow, BorrowMut};
-use std::ops::Deref;
+use std::borrow::{Borrow};
 
 pub struct Solution {}
 
@@ -15,6 +14,14 @@ impl ListNode {
     fn new(val: i32) -> Self {
         ListNode { next: None, val }
     }
+
+    fn new_with_ref(val: i32, next: Option<Box<ListNode>>) -> Self {
+        ListNode { val, next }
+    }
+
+    fn push(val: i32, previous: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        return Option::Some(Box::from(ListNode::new_with_ref(val, previous)));
+    }
 }
 
 impl Solution {
@@ -25,32 +32,30 @@ impl Solution {
         let mut l1_iter = l1.borrow();
         let mut l2_iter = l2.borrow();
 
-        let mut head_node = None.borrow_mut();
-        let mut current_node = None.borrow_mut();
-        while !l1_iter.is_none() || !l2_iter.is_none() {
-            let &mut next_val;
+        let mut value_stack: Vec<i32> = Vec::new();
+        while l1_iter.is_some() || l2_iter.is_some() {
             if let (Some(l1_val), None) = (l1_iter, l2_iter) {
-                next_val = l1_val.val;
+                value_stack.push(l1_val.val);
                 l1_iter = l1_val.next.borrow();
             } else if let (None, Some(l2_val)) = (l1_iter, l2_iter) {
-                next_val = l2_val.val;
+                value_stack.push(l2_val.val);
                 l2_iter = l2_val.next.borrow();
             } else if let (Some(l1_val), Some(l2_val)) = (l1_iter, l2_iter) {
                 if l1_val.val <= l2_val.val {
-                    next_val = l2_val.val;
-                    l2_iter = l2_val.next.borrow();
-                } else {
-                    next_val = l1_val.val;
+                    value_stack.push(l1_val.val);
                     l1_iter = l1_val.next.borrow();
+                } else {
+                    value_stack.push(l2_val.val);
+                    l2_iter = l2_val.next.borrow();
                 }
-            }
-            if current_node.is_none() {
-                current_node = &mut Option::Some(Box::from(ListNode::new(next_val)));
-                head_node = current_node;
-            } else {
-                let &mut next_node = &mut ListNode::new(next_val).borrow_mut();
-                next_node.next = current_node.clone();
-                current_node = Option::Some(Box::from(next_node));
+            } else { panic!("Something something unreachable") }
+        }
+
+        let mut head_node = None;
+        loop {
+            match value_stack.pop() {
+                Some(next_val) => head_node = ListNode::push(next_val, head_node),
+                None => break
             }
         }
 
@@ -59,13 +64,18 @@ impl Solution {
 }
 
 fn main() {
-    println!(
-        "{}",
-        Solution::merge_two_lists(
-            Option::Some(Box::new(ListNode::new(0))),
-            Option::Some(Box::new(ListNode::new(1))),
-        )
-        .unwrap()
-        .val
+    let mut result = Solution::merge_two_lists(
+        Option::Some(Box::new(ListNode::new(0))),
+        Option::Some(Box::new(ListNode::new(1))),
     );
+    loop {
+        if result.is_some() {
+            let current = result.unwrap();
+            println!("{}", current.val);
+            result = current.next;
+        }
+        else {
+            break;
+        }
+    }
 }
