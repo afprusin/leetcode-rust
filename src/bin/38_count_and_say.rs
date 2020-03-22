@@ -15,18 +15,20 @@ impl Solution {
         let mut last_char: char = to_say.chars().next().unwrap();
         let mut duplicate_count: i32 = 0;
         let mut char_iterator = to_say.chars().into_iter();
-        let mut as_say: String = String::new();
+        let mut as_said: String = String::new();
         loop {
             match char_iterator.next() {
                 None => {
-                    as_say.push_str(duplicate_count.to_string().as_ref());
-                    as_say.push(last_char);
+                    // TODO: Duplicate code, questionable flow control
+                    as_said.push_str(duplicate_count.to_string().as_ref());
+                    as_said.push(last_char);
                     break;
                 },
                 Some(current_char) => {
                     if last_char != current_char {
-                        as_say.push_str(duplicate_count.to_string().as_ref());
-                        as_say.push(last_char);
+                        as_said.push_str(duplicate_count.to_string().as_ref());
+                        // TODO: Duplicate code, questionable flow control
+                        as_said.push(last_char);
                         last_char = current_char;
                         duplicate_count = 1;
                     }
@@ -36,7 +38,7 @@ impl Solution {
                 }
             }
         }
-        return as_say;
+        return as_said;
     }
 }
 
