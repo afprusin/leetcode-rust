@@ -17,14 +17,13 @@ impl ListNode {
 }
 
 impl Solution {
-    // Cribbed from user 'ashtower' - this example perfectly explains the use of references/pointers
+    // Cribbed from user 'ashtower' - this example perfectly explains the use of references
     //  within immutable parameters
     pub fn remove_elements(head: Option<Box<ListNode>>, val: i32) -> Option<Box<ListNode>> {
         let mut result= head;
         let mut current = &mut result;
 
         while current.is_some() {
-            //let current_ref = current.as_ref().unwrap();
             if current.as_ref().unwrap().val == val {
                 *current = current.take().unwrap().next;
             } else {
