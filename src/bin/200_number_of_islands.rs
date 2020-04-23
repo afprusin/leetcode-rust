@@ -1,4 +1,4 @@
-use std::collections::{HashSet};
+use std::borrow::BorrowMut;
 
 pub struct Solution {}
 
@@ -9,48 +9,56 @@ impl Solution {
             return 0;
         }
 
+        let mut grid = grid;
         let mut islands: i32 = 0;
-        let mut explored: HashSet<(usize, usize)> = HashSet::new();
 
-        for (row_index, row) in grid.iter().enumerate() {
-            for (column_index, terrain_type) in row.iter().enumerate() {
-                match terrain_type {
-                    '0' => {},
+        let row_length = grid.len();
+        let column_length = grid[0].len();
+        for row_index in 0..row_length {
+            for column_index in 0..column_length {
+                match grid[row_index][column_index] {
                     '1' => {
-                        if !explored.contains(&(row_index, column_index)) {
-                            explore_recursively(row_index, column_index, &grid, &mut explored);
-                            islands += 1;
-                        }
+                        explore_recursively(row_index, column_index, grid.borrow_mut());
+                        islands += 1;
                     },
-                    _ => panic!("Input contained invalid character")
+                    _ => {}
                 }
             }
         }
 
         return islands;
 
-        fn explore_recursively(row: usize, column: usize,
-                               grid: &Vec<Vec<char>>, explored: &mut HashSet<(usize, usize)>) {
-            if grid[row][column] == '0' || !explored.insert((row, column)) {
-                return;
-            }
+        fn explore_recursively(row: usize, column: usize, grid: &mut Vec<Vec<char>>) {
+            let mut to_explore: Vec<(usize, usize)> = vec![(row, column)];
+            grid[row][column] = '0';
 
-            if row > 0 {
-                explore_recursively(row - 1, column, grid, explored);
-            }
-            if row < grid.len() - 1 {
-                explore_recursively(row + 1, column, grid, explored);
-            }
-            if column > 0 {
-                explore_recursively(row, column - 1, grid, explored);
-            }
-            if column < grid[0].len() - 1 {
-                explore_recursively(row, column + 1, grid, explored);
-            }
+            while let Some(current) = to_explore.pop() {
+                let current_row = current.0;
+                let current_column = current.1;
 
+                if current_row > 0 && current_row < (grid.len() - 1) {
+                    if grid[current_row - 1][current_column] != '0' {
+                        grid[current_row - 1][current_column] = '0';
+                        to_explore.push((current_row - 1, current_column));
+                    }
+                    if grid[current_row + 1][current_column] != '0' {
+                        grid[current_row + 1][current_column] = '0';
+                        to_explore.push((current_row + 1, current_column));
+                    }
+                }
+                if current_column > 0 && current_column < (grid[0].len() - 1) {
+                    if grid[current_row][current_column - 1] != '0' {
+                        grid[current_row][current_column - 1] = '0';
+                        to_explore.push((current_row, current_column - 1));
+                    }
+                    if  grid[current_row][current_column - 1] != '0' {
+                        grid[current_row][current_column + 1] = '0';
+                        to_explore.push((current_row, current_column + 1));
+                    }
+                }
+            }
         }
     }
-
 }
 
 fn main() {
