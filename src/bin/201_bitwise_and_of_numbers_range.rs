@@ -1,50 +1,27 @@
-use std::rc::Rc;
-use std::cell::{RefCell};
-use std::borrow::Borrow;
-
 pub struct Solution {}
 
-// Definition for a binary tree node.
-#[derive(Debug, PartialEq, Eq)]
-pub struct TreeNode {
-  pub val: i32,
-  pub left: Option<Rc<RefCell<TreeNode>>>,
-  pub right: Option<Rc<RefCell<TreeNode>>>,
-}
-
-impl TreeNode {
-  #[inline]
-  pub fn new(val: i32) -> Self {
-    TreeNode {
-      val,
-      left: None,
-      right: None
-    }
-  }
-}
-
 impl Solution {
-    pub fn max_depth(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        fn recursive_max_depth(node: Option<&Rc<RefCell<TreeNode>>>, depth: i32) -> i32 {
-            return match node {
-                None => depth,
-                Some(node_val) => {
-                    let deref_node = (**node_val).borrow();
-                    let left_depth = recursive_max_depth(deref_node.left.as_ref(), depth + 1);
-                    let right_depth = recursive_max_depth(deref_node.right.as_ref(), depth + 1);
-                    if left_depth > right_depth {
-                        left_depth
-                    } else {
-                        right_depth
-                    }
-                }
-            };
+    pub fn range_bitwise_and(m: i32, n: i32) -> i32 {
+        let mut base: i64 = 1;
+        let m: i64 = m as i64;
+        let n: i64 = n as i64;
+        let mut total = 0;
+
+        while base <= m && base <= n {
+            if ((m / base) % 2 != 0) && ((n / base) % 2 != 0) && (n - m < base) {
+                total += base;
+            }
+            base *= 2;
         }
-        return recursive_max_depth(root.borrow().as_ref(), 0);
+
+        return total as i32;
     }
 }
 
 fn main() {
-    assert_eq!(0, Solution::max_depth(Option::None));
-    assert_eq!(1, Solution::max_depth(Option::Some(Rc::from(RefCell::from(TreeNode::new(1))))));
+    assert_eq!(4, Solution::range_bitwise_and(5, 7));
+    assert_eq!(0, Solution::range_bitwise_and(0, 1));
+    assert_eq!(2147483647, Solution::range_bitwise_and(2147483647, 2147483647));
+    assert_eq!(1, Solution::range_bitwise_and(1, 1));
+
 }
